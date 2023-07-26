@@ -15,7 +15,7 @@ window.onload = () => {
   let timeOut;
 
   class Snake {
-    constructor(body, direction) {
+    constructor(direction, ...body) {
       this.body = body;
       this.direction = direction;
       this.ateApple = false;
@@ -24,8 +24,8 @@ window.onload = () => {
     draw() {
       ctx.save();
       ctx.fillStyle = "#ff0000";
-      for (let i = 0; i < this.body.length; i++) {
-        drawBlock(ctx, this.body[i]);
+      for (let block of this.body) {
+        drawBlock(ctx, block);
       }
       ctx.restore();
     }
@@ -75,10 +75,8 @@ window.onload = () => {
     checkCollision() {
       let wallCollision = false;
       let snakeCollision = false;
-      const head = this.body[0];
-      const rest = this.body.slice(1);
-      const snakeX = head[0];
-      const snakeY = head[1];
+      const [head, ...rest] = this.body;
+      const [snakeX, snakeY] = head;
       const minX = 0;
       const minY = 0;
       const maxX = widthInBlocks - 1;
@@ -89,9 +87,8 @@ window.onload = () => {
       if (isNotBetweenHorizontalWalls || isNotBetweenVerticalWalls)
         wallCollision = true;
 
-      for (let i = 0; i < rest.length; i++) {
-        if (snakeX === rest[i][0] && snakeY === rest[i][1])
-          snakeCollision = true;
+      for (let block of rest) {
+        if (snakeX === block[0] && snakeY === block[1]) snakeCollision = true;
       }
 
       return wallCollision || snakeCollision;
@@ -133,11 +130,8 @@ window.onload = () => {
 
     isOnSnake(snakeToCheck) {
       let isOnSnake = false;
-      for (let i = 0; i < snakeToCheck.body.length; i++) {
-        if (
-          this.position[0] === snakeToCheck.body[i][0] &&
-          this.position[1] === snakeToCheck.body[i][1]
-        ) {
+      for (let block of snakeToCheck.body) {
+        if (this.position[0] === block[0] && this.position[1] === block[1]) {
           isOnSnake = true;
         }
       }
@@ -157,16 +151,7 @@ window.onload = () => {
   };
 
   const launch = () => {
-    snakee = new Snake(
-      [
-        [6, 4],
-        [5, 4],
-        [4, 4],
-        [3, 4],
-        [2, 4],
-      ],
-      "right"
-    );
+    snakee = new Snake("right", [6, 4], [5, 4], [4, 4], [3, 4], [2, 4]);
     applee = new Apple();
     score = 0;
     clearTimeout(timeOut);
@@ -238,9 +223,9 @@ window.onload = () => {
   };
 
   const drawBlock = (ctx, position) => {
-    const x = position[0] * blockSize;
-    const y = position[1] * blockSize;
-    ctx.fillRect(x, y, blockSize, blockSize);
+    //destructuring array
+    const [x, y] = position;
+    ctx.fillRect(x * blockSize, y * blockSize, blockSize, blockSize);
   };
 
   document.onkeydown = (e) => {
